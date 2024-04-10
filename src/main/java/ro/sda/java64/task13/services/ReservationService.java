@@ -1,7 +1,9 @@
 package ro.sda.java64.task13.services;
 
+import ch.qos.logback.core.model.INamedModel;
 import org.springframework.stereotype.Service;
 import ro.sda.java64.task13.entities.Reservation;
+import ro.sda.java64.task13.entities.Standard;
 import ro.sda.java64.task13.errors.NoResourceFound;
 import ro.sda.java64.task13.repositories.ReservationRepository;
 
@@ -41,10 +43,9 @@ public class ReservationService {
         return reservationRepository.findAllByName(name);
     }
 
-    public Reservation deleteById(Long id) {
+    public void deleteById(Long id) {
         Reservation entityToDelete = getById(id);
         reservationRepository.delete(entityToDelete);
-        return entityToDelete;
     }
 
     public Reservation getById(Long id) {
@@ -53,5 +54,9 @@ public class ReservationService {
 
     public List<Reservation> getActiveReservationsOnDate(LocalDate localDate) {
         return reservationRepository.findAllByStartDateLessThanEqualAndEndDateGreaterThanEqual(localDate,localDate);
+    }
+
+    public List<Reservation> getReservationsByStandardAndPriceGreaterThan(Standard standard, Integer price) {
+        return reservationRepository.findAllByStandardAndPriceGreaterThan(standard, price);
     }
 }

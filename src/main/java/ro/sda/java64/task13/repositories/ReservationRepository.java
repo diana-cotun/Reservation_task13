@@ -11,7 +11,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findAllByName(String name);
 
-    List<Reservation> findAllByStandardAndPrice(Standard standard, Integer price);
+    List<Reservation> findAllByStandardAndPriceGreaterThan(Standard standard, Integer price);
 
     List<Reservation> findAllByStartDateLessThanEqualAndEndDateGreaterThanEqual(LocalDate startDate, LocalDate endDate);
 
