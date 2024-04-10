@@ -43,10 +43,16 @@ public class ReservationController {
 //     ResponseEntity<Reservation> SAU Reservation ???
 //    @Repository, @Transactional cand le folosim
 
+//    @DeleteMapping
+//    public HttpStatus deleteReservationById(@RequestParam Long id) {
+//        reservationService.deleteById(id);
+//        return HttpStatus.NO_CONTENT;
+//    }
+
     @DeleteMapping
-    public HttpStatus deleteReservationById(@RequestParam Long id) {
+    public ResponseEntity<Object> deleteReservationById(@RequestParam Long id) {
         reservationService.deleteById(id);
-        return HttpStatus.NO_CONTENT;
+        return ResponseEntity.noContent().build();
     }
 
 //    @DeleteMapping("/{id}")
