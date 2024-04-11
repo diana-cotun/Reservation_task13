@@ -1,6 +1,5 @@
 package ro.sda.java64.task13.services;
 
-import ch.qos.logback.core.model.INamedModel;
 import org.springframework.stereotype.Service;
 import ro.sda.java64.task13.entities.Reservation;
 import ro.sda.java64.task13.entities.Standard;
@@ -20,6 +19,10 @@ public class ReservationService {
     }
 
     public Reservation addReservation(Reservation reservation) {
+        List<Reservation> existingReservation = allReservationsByName(reservation.getName());
+        if (!existingReservation.isEmpty()) {
+            throw new RuntimeException();
+        }
         return reservationRepository.save(reservation);
     }
 
@@ -43,9 +46,10 @@ public class ReservationService {
         return reservationRepository.findAllByName(name);
     }
 
-    public void deleteById(Long id) {
+    public Reservation stergeDupaId(Long id) {
         Reservation entityToDelete = getById(id);
         reservationRepository.delete(entityToDelete);
+        return entityToDelete;
     }
 
     public Reservation getById(Long id) {

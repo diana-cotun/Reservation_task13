@@ -51,7 +51,7 @@ public class ReservationController {
 
     @DeleteMapping
     public ResponseEntity<Object> deleteReservationById(@RequestParam Long id) {
-        reservationService.deleteById(id);
+        reservationService.stergeDupaId(id);
         return ResponseEntity.noContent().build();
     }
 
