@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ro.sda.java64.task13.entities.Reservation;
+import ro.sda.java64.task13.errors.NoResourceFound;
 import ro.sda.java64.task13.services.ReservationService;
 
 import java.time.LocalDate;
@@ -29,6 +30,7 @@ class ReservationControllerTest {
 
     @MockBean
     ReservationService reservationService;
+
 
     @Autowired
     ObjectMapper objectMapper;
@@ -55,5 +57,39 @@ class ReservationControllerTest {
         verify(reservationService,never()).getById(any());
     }
 
+    @Test
+    void when_delete_by_missing_id_then_receive_not_found_status() throws Exception {
+        Long id = 1L;
+        when(reservationService.stergeDupaId(id)).thenThrow(NoResourceFound.class);
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/reservation")
+                .param("id",String.valueOf(id)))
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+        ;
+        verify(reservationService,times(1)).stergeDupaId(any());
+
+    }
+
+    @Test
+    void when_create_reservation_receive_id_forReservation() throws Exception {
+
+        Long id = 1L;
+        Reservation sentReservation = Reservation.builder().name("AlaBala").hotelName("Piatra arsa").price(100).build();
+        Reservation expectedReservation = Reservation.builder().id(id).name("AlaBala").hotelName("Piatra arsa").price(100).build();
+        //mock
+        when(reservationService.addReservation(sentReservation)).thenReturn(expectedReservation);
+        String requestBody=objectMapper.writeValueAsString(sentReservation);
+
+        String expectedResult = objectMapper.writeValueAsString(expectedReservation);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/reservation")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+                .andExpect(MockMvcResultMatchers.content().json(expectedResult))
+        ;
+
+        verify(reservationService,times(1)).addReservation(any());
+    }
 
 }
