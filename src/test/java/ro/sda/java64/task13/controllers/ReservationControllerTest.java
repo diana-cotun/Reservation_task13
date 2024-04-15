@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ro.sda.java64.task13.entities.Reservation;
+import ro.sda.java64.task13.entities.Standard;
 import ro.sda.java64.task13.errors.NoResourceFound;
 import ro.sda.java64.task13.services.ReservationService;
 
@@ -31,14 +32,16 @@ class ReservationControllerTest {
     @MockBean
     ReservationService reservationService;
 
-
     @Autowired
     ObjectMapper objectMapper;
 
     @Test
     void when_fetch_reservation_by_id_object_should_be_returned() throws Exception {
         Long id = 1L;
-        Reservation expectedReservation = Reservation.builder().id(id).name("ÄlaBala").hotelName("Piatra arsa").price(100).build();
+        Reservation expectedReservation = Reservation.builder()
+                .id(id).name("ÄlaBala")
+                .hotelName("Piatra arsa")
+                .price(100).build();
 
         String returnList = objectMapper.writeValueAsString(List.of(expectedReservation));
 
@@ -90,6 +93,62 @@ class ReservationControllerTest {
         ;
 
         verify(reservationService,times(1)).addReservation(any());
+    }
+    @Test
+    void when_update_reservation_by_Id_then_receive_updated_reservation() throws Exception {
+
+        Reservation sentReservation = Reservation.builder()
+                .id(1L)
+                .name("Diana")
+                .hotelName("Artemis")
+                .numberOfPeople(2)
+                .standard(Standard.NORMAL)
+                .startDate(LocalDate.ofEpochDay(2024-4-16))
+                .endDate(LocalDate.ofEpochDay(2024-4-30))
+                .price(200)
+                .build();
+        Reservation updatedReservation = Reservation.builder()
+                .numberOfPeople(4)
+                .price(500)
+                .build();
+
+        when(reservationService.updateReservation(sentReservation, sentReservation.getId())).thenReturn(updatedReservation);
+
+        String requestBody = objectMapper.writeValueAsString(sentReservation);
+        String receiveReservation = objectMapper.writeValueAsString(updatedReservation);
+
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/reservation")
+                        .content(requestBody)
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.content().json(receiveReservation));
+
+//        verify(reservationService, times(1)).updateReservation(any(), anyLong());
+    }
+
+    @Test
+    void when_fetch_reservations_by_name_than_receive_list_reservations() throws Exception {
+        Reservation existingReservation = Reservation.builder()
+                .name("Diana")
+                .hotelName("Artemis")
+                .numberOfPeople(2)
+                .build();
+
+        when(reservationService.allReservationsByName(existingReservation.getName())).thenReturn(List.of(existingReservation));
+
+        String receiveReservation = objectMapper.writeValueAsString(List.of(existingReservation));
+
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/reservation/name/Diana"))
+
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.content().json(receiveReservation));
+
+        verify(reservationService, times(1)).allReservationsByName(anyString());
     }
 
 }

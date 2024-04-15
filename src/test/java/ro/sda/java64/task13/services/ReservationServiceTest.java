@@ -82,9 +82,7 @@ class ReservationServiceTest {
                 .build();
         when(reservationRepository.findAllByName(anyString())).thenReturn(List.of(expectedReservation));
 
-        assertThrows(RuntimeException.class, () -> {
-            reservationService.addReservation(expectedReservation);
-        });
+        assertThrows(RuntimeException.class, () -> reservationService.addReservation(expectedReservation));
         verify(reservationRepository, times(1)).findAllByName(any());
         verify(reservationRepository, times(0)).save(any());
     }
@@ -92,17 +90,13 @@ class ReservationServiceTest {
     @Test
     void when_fetch_by_non_existing_then_receive_exception() {
         when(reservationRepository.findById(any())).thenReturn(Optional.empty());
-        assertThrows(NoResourceFound.class, () -> {
-            reservationService.getById(1L);
-        });
+        assertThrows(NoResourceFound.class, () -> reservationService.getById(1L));
     }
 
     @Test
     void when_deleting_by_non_existing_Id_throw_exception() {
         when(reservationRepository.findById(any())).thenReturn(Optional.empty());
-        assertThrows(NoResourceFound.class, () -> {
-            reservationService.stergeDupaId(1L);
-        });
+        assertThrows(NoResourceFound.class, () -> reservationService.stergeDupaId(1L));
 
         //Never called deleteById
         verify(reservationRepository, never()).deleteById(any());
@@ -123,7 +117,7 @@ class ReservationServiceTest {
         Reservation actualReservation = reservationService.stergeDupaId(id);
 
         assertEquals(expectedReservation, actualReservation);
-        verify(reservationRepository, times(1)).deleteById(any());
+        verify(reservationRepository, times(1)).delete(any());
 
     }
 

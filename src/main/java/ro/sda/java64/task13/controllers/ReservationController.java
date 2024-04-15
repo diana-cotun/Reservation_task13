@@ -35,7 +35,7 @@ public class ReservationController {
         return reservationService.allReservations();
     }
 
-    @GetMapping("/{name}")
+    @GetMapping("/name/{name}")
     public List<Reservation> getReservationByName(@PathVariable String name) {
         return reservationService.allReservationsByName(name);
     }
@@ -74,6 +74,11 @@ public class ReservationController {
     @ExceptionHandler(value = IllegalArgumentException.class)
     ResponseEntity<Object> handleIllegalRequests(IllegalArgumentException ex){
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = RuntimeException.class)
+    ResponseEntity<Object> handleRuntimeException(RuntimeException ex){
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(value = NoResourceFound.class)

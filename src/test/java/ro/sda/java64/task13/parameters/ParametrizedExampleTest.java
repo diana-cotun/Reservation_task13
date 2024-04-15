@@ -61,6 +61,7 @@ public class ParametrizedExampleTest {
     void isBlank_ShouldReturnTrueForAllTypesOfBlankStrings(String input) {
         assertTrue(StringUtils.isBlank(input));
     }
+
     @ParameterizedTest
     @EnumSource(Month.class) // passing all 12 months
     void getValueForAMonth_IsAlwaysBetweenOneAndTwelve(Month month) {
@@ -74,6 +75,7 @@ public class ParametrizedExampleTest {
         final boolean isALeapYear = false;
         assertEquals(30, month.length(isALeapYear));
     }
+
     @ParameterizedTest
     @EnumSource(
             value = Month.class,
@@ -85,7 +87,10 @@ public class ParametrizedExampleTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = Month.class, names = ".+BER", mode = EnumSource.Mode.MATCH_ANY)
+    @EnumSource(
+            value = Month.class,
+            names = ".+BER",
+            mode = EnumSource.Mode.MATCH_ANY)
     void fourMonths_AreEndingWithBer(Month month) {
         EnumSet<Month> months =
                 EnumSet.of(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER, Month.DECEMBER);
@@ -98,6 +103,7 @@ public class ParametrizedExampleTest {
         String actualValue = input.toUpperCase();
         assertEquals(expected, actualValue);
     }
+
     @ParameterizedTest
     @CsvSource(value = {"test:test", "tEst:test", "Java:java"}, delimiter = ':')
     void toLowerCase_ShouldGenerateTheExpectedLowercaseValue(String input, String expected) {
@@ -107,8 +113,7 @@ public class ParametrizedExampleTest {
 
     @ParameterizedTest
     @CsvFileSource(resources = "/data.csv", numLinesToSkip = 1)
-    void toUpperCase_ShouldGenerateTheExpectedUppercaseValueCSVFile(
-            String input, String expected) {
+    void toUpperCase_ShouldGenerateTheExpectedUppercaseValueCSVFile(String input, String expected) {
         String actualValue = input.toUpperCase();
         assertEquals(expected, actualValue);
     }
