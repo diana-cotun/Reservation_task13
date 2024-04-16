@@ -154,5 +154,6 @@ public class ReservationIntegrationTest {
         reservationRepository.save(reservationObject);
         mockMvc.perform(MockMvcRequestBuilders.get("/reservation/name/Azorel"))
                 .andExpect(jsonPath("$").isEmpty());
+
     }
 }
