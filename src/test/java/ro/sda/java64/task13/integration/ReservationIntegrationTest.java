@@ -79,4 +79,80 @@ public class ReservationIntegrationTest {
                         .content(requestBody))
                 .andExpect(MockMvcResultMatchers.status().is5xxServerError());
     }
+    @Test
+    void updateReservationTest() throws Exception {
+        Reservation reservationObject = Reservation.builder()
+
+                .name("Ana")
+                .hotelName("Artemis")
+                .numberOfPeople(4)
+                .standard(Standard.NORMAL)
+                .startDate(LocalDate.ofEpochDay(2024-4-16))
+                .endDate(LocalDate.ofEpochDay(2024-4-30))
+                .price(200)
+                .build();
+        Reservation savedObject= reservationRepository.save(reservationObject);
+        savedObject.setName("ANDREI");
+        String requestBody = objectMapper.writeValueAsString(reservationObject);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/reservation")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+                .andExpect(jsonPath("$.name").value("ANDREI"));
+
+
+    }
+    @Test
+    void when_we_have_an_object_with_a_name_then_receive_the_object_from_db() throws Exception {
+        Reservation reservationObject = Reservation.builder()
+
+                .name("Ana")
+                .hotelName("Artemis")
+                .numberOfPeople(4)
+                .standard(Standard.NORMAL)
+                .startDate(LocalDate.ofEpochDay(2024-4-16))
+                .endDate(LocalDate.ofEpochDay(2024-4-30))
+                .price(200)
+                .build();
+        Reservation reservationObject2 = Reservation.builder()
+
+                .name("Ana")
+                .hotelName("Artemis")
+                .numberOfPeople(4)
+                .standard(Standard.NORMAL)
+                .startDate(LocalDate.ofEpochDay(2024-4-16))
+                .endDate(LocalDate.ofEpochDay(2024-4-30))
+                .price(200)
+                .build();
+
+        reservationRepository.save(reservationObject);
+        reservationRepository.save(reservationObject2);
+        mockMvc.perform(MockMvcRequestBuilders.get("/reservation/name/Ana"))
+                .andExpect(jsonPath("$").isNotEmpty())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].name").value("Ana"))
+                .andExpect(jsonPath("$[0].id").value("1"))
+                .andExpect(jsonPath("$[1].name").value("Ana"))
+                .andExpect(jsonPath("$[1].id").value("2"));
+
+    }
+
+    @Test
+    void when_we_have_an_object_with_a_name_then_no_object_found() throws Exception {
+        Reservation reservationObject = Reservation.builder()
+
+                .name("Ana")
+                .hotelName("Artemis")
+                .numberOfPeople(4)
+                .standard(Standard.NORMAL)
+                .startDate(LocalDate.ofEpochDay(2024-4-16))
+                .endDate(LocalDate.ofEpochDay(2024-4-30))
+                .price(200)
+                .build();
+
+        reservationRepository.save(reservationObject);
+        mockMvc.perform(MockMvcRequestBuilders.get("/reservation/name/Azorel"))
+                .andExpect(jsonPath("$").isEmpty());
+    }
 }
